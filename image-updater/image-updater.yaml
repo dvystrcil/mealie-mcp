@@ -1,0 +1,15 @@
+apiVersion: image-updater.opencode.dev/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: mealie-mcp
+  namespace: mealie-mcp
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mealie-mcp
+  registry:
+    type: harbor
+    host: harbor.sirddail.net
+    project: ai
+    repository: mealie-mcp
