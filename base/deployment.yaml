@@ -3,7 +3,17 @@ kind: Deployment
 metadata:
   name: mealie-mcp
   namespace: mealie-mcp
+  labels:
+    app: mealie-mcp
+  # NOTE: legacy argocd-image-updater.argoproj.io/* annotations removed
+  # 2026-05-26. Per feedback_image_updater_crd_not_annotations, the homelab
+  # uses ImageUpdater CRs (dvystrcil/argocd-image-updater/<app>/), not
+  # Deployment annotations. The annotations were inert here — they never
+  # triggered an auto-bump, which is why this image was stuck at the build
+  # SHA from whenever it was first deployed. A proper CR is shipped in
+  # argocd-image-updater/mealie-mcp/.
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mealie-mcp
@@ -12,8 +22,53 @@ spec:
       labels:
         app: mealie-mcp
     spec:
+      imagePullSecrets:
+      - name: mealie-mcp-harbor-pull
       containers:
       - name: mealie-mcp
-        image: harbor.sirddail.net/ai/mealie-mcp:latest
+        image: harbor.sirddail.net/ai/mealie-mcp:sha-9623b85
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8765
+        - name: mcp
+          containerPort: 8765
+          protocol: TCP
+        env:
+        - name: MEALIE_BASE_URL
+          value: http://mealie.mealie.svc.cluster.local:80
+        - name: MEALIE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mealie-mcp-secrets
+              key: MEALIE_API_KEY
+        - name: MCP_PORT
+          value: "8765"
+        - name: LOG_LEVEL
+          value: INFO
+        readinessProbe:
+          # The /mcp endpoint serves POST for tool calls; a GET returns
+          # 4xx but proves the server is listening. We accept any HTTP
+          # response (including 4xx) as "ready".
+          tcpSocket:
+            port: 8765
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+        livenessProbe:
+          tcpSocket:
+            port: 8765
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 25m
+            memory: 250Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+          capabilities:
+            drop: ["ALL"]

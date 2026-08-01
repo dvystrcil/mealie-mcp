@@ -1,0 +1,5 @@
+resources:
+- ../kustomize
+images:
+- name: harbor.sirddail.net/ai/mealie-mcp
+  newTag: 0.0.5

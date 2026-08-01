@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mealie-mcp
+resources:
+  - namespace.yaml
+  - infisical-secret.yaml
+  - harbor-pull-secret.yaml
+  - image-updater-rbac.yaml
+  - deployment.yaml
+  - service.yaml
+  - vpa.yaml
+images:
+  - name: harbor.sirddail.net/ai/mealie-mcp
+    newTag: 0.0.5
