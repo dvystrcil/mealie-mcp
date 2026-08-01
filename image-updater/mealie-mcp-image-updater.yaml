@@ -1,0 +1,63 @@
+# ImageUpdater CR for mealie-mcp.
+#
+# Per architecture/applicationset-patterns.md (homelab repo): IU CRDs
+# use the *routing* ApplicationSet pattern — the CR lives next to its
+# app's deploy manifests (here in this repo's image-updater/ directory),
+# enrolled into the cluster via the image-updater-apps ApplicationSet
+# in argocd-projects.
+#
+# Watches harbor.sirddail.net/ai/mealie-mcp for new semver release tags
+# (v0.X.Y) and rewrites kustomize/deployment.yaml's image field in this
+# same repo. Argo picks up the new commit and syncs the Deployment.
+#
+# Pattern: open-terminal's auto-release chain
+#   1. Push to main → docker.yaml builds image + auto-creates GitHub
+#      release (patch++ via the `Create GitHub release` step)
+#   2. Release publish fires docker-release.yaml → retags Harbor image
+#      with vX.Y.Z (in addition to sha-<hex>)
+#   3. This IU CR finds the new semver tag, writes it back to the
+#      Deployment, Argo syncs
+#
+# Why semver, not sha-*:
+# Sha tags are commit pointers (can be rebased away; no vocabulary).
+# Semver carries meaning (major = breaking, minor = additive, patch =
+# fix). Same auto-bump cadence, better semantics.
+#
+# Migration history:
+#   - Initially shipped via dvystrcil/argocd-image-updater#12 (sha-* regex)
+#   - Flipped to semver via dvystrcil/argocd-image-updater#13
+#   - 2026-05-26: relocated FROM dvystrcil/argocd-image-updater/mealie-mcp/
+#     TO this distributed location per homelab#236 + architecture doc.
+#     Both centralized and distributed shapes existed in production; the
+#     architecture decision picked distributed (cohesion with deploy).
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: mealie-mcp-iu
+spec:
+  namespace: argocd
+  applicationRefs:
+    - namePattern: "mealie-mcp"
+      useAnnotations: false
+      images:
+        - alias: "mealie-mcp"
+          imageName: "harbor.sirddail.net/ai/mealie-mcp"
+          commonUpdateSettings:
+            # Match the v-prefixed semver tags emitted by docker-release.yaml.
+            # Excludes sha-<hex> tags (also present in registry but those
+            # are intermediate / pre-release-cut artifacts).
+            allowTags: 'regexp:^[0-9]+\.[0-9]+\.[0-9]+$'
+            # Semver strategy picks the highest version among matching tags.
+            # The leading 'v' is handled correctly by image-updater per its
+            # docs (accepts v-prefixed semver tags).
+            updateStrategy: "semver"
+            pullSecret: "pullsecret:mealie-mcp/mealie-mcp-harbor-pull"
+            forceUpdate: false
+      writeBackConfig:
+        method: "git"
+        gitConfig:
+          repository: "https://github.com/dvystrcil/mealie-mcp-docker.git"
+          branch: "main"
+          # Mixed-shape repo — deploy manifests live in kustomize/ alongside
+          # the Dockerfile. The kustomization.yaml is mutated in place.
+          writeBackTarget: "kustomization:/overlays"
