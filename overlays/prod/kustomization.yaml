@@ -3,7 +3,3 @@ kind: Kustomization
 
 resources:
   - ../../base
-
-images:
-  - name: harbor.sirddail.net/ai/mealie-mcp
-    newTag: latest
