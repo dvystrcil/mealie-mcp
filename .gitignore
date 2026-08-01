@@ -1,0 +1,10 @@
+
+.env
+*.env
+*.log
+.DS_Store
+
+.env
+*.env
+*.log
+.DS_Store
