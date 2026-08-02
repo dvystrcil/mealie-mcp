@@ -10,6 +10,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Validate kustomize build
-        run: |
-          kubectl kustomize overlays > /dev/null
+      - uses: dvystrcil/kustomize-validate-action@v1
+

@@ -23,7 +23,7 @@ spec:
         app: mealie-mcp
     spec:
       imagePullSecrets:
-      - name: mealie-mcp-harbor-pull
+        - name: mealie-mcp-harbor-pull
       containers:
       - name: mealie-mcp
         image: harbor.sirddail.net/ai/mealie-mcp:sha-9623b85
@@ -59,6 +59,8 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 30
           timeoutSeconds: 5
+        # D-012 (VPA epic homelab#455): requests right-sized from the
+        # Off-mode VPA's measured target. See notes in the PR body.
         resources:
           requests:
             cpu: 25m
