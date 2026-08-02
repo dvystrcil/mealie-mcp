@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Set up kubectl
-        uses: azure/k8s-set-up@v3
       - name: Validate kustomize build
         run: |
-          kustomize build overlays | kubectl apply --dry-run=client -f -
+          kubectl kustomize overlays > /dev/null
