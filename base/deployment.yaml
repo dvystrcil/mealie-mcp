@@ -5,6 +5,8 @@ metadata:
   namespace: mealie-mcp
   labels:
     app: mealie-mcp
+  annotations:
+    reloader.stakater.com/auto: "true"
   # NOTE: legacy argocd-image-updater.argoproj.io/* annotations removed
   # 2026-05-26. Per feedback_image_updater_crd_not_annotations, the homelab
   # uses ImageUpdater CRs (dvystrcil/argocd-image-updater/<app>/), not
