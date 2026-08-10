@@ -25,7 +25,7 @@ spec:
         app: mealie-mcp
     spec:
       imagePullSecrets:
-        - name: mealie-mcp-harbor-pull
+      - name: mealie-mcp-harbor-pull
       containers:
       - name: mealie-mcp
         image: harbor.sirddail.net/ai/mealie-mcp:sha-9623b85
