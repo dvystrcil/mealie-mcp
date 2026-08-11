@@ -35,7 +35,15 @@ kind: ImageUpdater
 metadata:
   name: mealie-mcp-iu
 spec:
-  namespace: argocd
+  # No `namespace:` here. The ImageUpdater CRD declares exactly three spec
+  # fields — applicationRefs, commonUpdateSettings, writeBackConfig — so
+  # ServerSideApply rejects the object outright:
+  #   failed to create typed patch object … .spec.namespace: field not
+  #   declared in schema
+  # The CR's own namespace comes from metadata.namespace / the Application's
+  # destination, not from spec. This went unnoticed because the file was
+  # never applied: the ApplicationSet rendered the build repo's copy instead,
+  # so this one sat dormant and unvalidated.
   applicationRefs:
     - namePattern: "mealie-mcp"
       useAnnotations: false
