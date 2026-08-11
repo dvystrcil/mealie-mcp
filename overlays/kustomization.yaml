@@ -2,4 +2,4 @@ resources:
 - ../base
 images:
 - name: harbor.sirddail.net/ai/mealie-mcp
-  newTag: 0.0.5
+  newTag: 0.0.15
