@@ -56,8 +56,16 @@ spec:
       writeBackConfig:
         method: "git"
         gitConfig:
-          repository: "https://github.com/dvystrcil/mealie-mcp-docker.git"
+          # THIS repo (the deploy repo), not mealie-mcp-docker. The old value
+          # was correct when written: mealie-mcp was a mixed-shape repo whose
+          # deploy manifests sat beside the Dockerfile. They moved here on
+          # 2026-08-01 ("feat: initial deploy manifests for mealie-mcp") and
+          # this line was never updated, so image-updater has since cloned
+          # the build repo and failed every reconcile with
+          #   could not find kustomization in /tmp/git-mealie-mcp…/overlays
+          # That is silent in effect — a write-back failure just means the
+          # tag never changes — so this app sat on 0.0.5 while the build
+          # repo released through v0.0.15.
+          repository: "https://github.com/dvystrcil/mealie-mcp.git"
           branch: "main"
-          # Mixed-shape repo — deploy manifests live in kustomize/ alongside
-          # the Dockerfile. The kustomization.yaml is mutated in place.
           writeBackTarget: "kustomization:/overlays"
