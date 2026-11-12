@@ -19,14 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Scope: code in this repository (Dockerfile, src/, .github/workflows/, scripts).
-Documentation (README.md, patches/README.md) is also MIT-licensed in this
-repository — its scope is operational/configuration documentation, not general
-content. If this repository ever goes public, consider CC-BY-4.0 for the docs
-to match dvystrcil/homelab's licensing pattern.
-
-Upstream code from rldiao/mealie-mcp-server is installed via pip at build time
-and retains its upstream license — see https://github.com/rldiao/mealie-mcp-server.
