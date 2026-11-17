@@ -5,7 +5,6 @@ resources:
   - namespace.yaml
   - infisical-secret.yaml
   - harbor-pull-secret.yaml
-  - image-updater-rbac.yaml
   - deployment.yaml
   - service.yaml
   - vpa.yaml
